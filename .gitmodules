@@ -1,0 +1,8 @@
+[submodule "src/meta-raspberrypi"]
+	path = src/meta-raspberrypi
+	url = git://git.yoctoproject.org/poky
+	branch = scarthgap
+[submodule "src/poky"]
+	path = src/poky
+	url = https://github.com/yoctoproject/poky.git
+	branch = scarthgap

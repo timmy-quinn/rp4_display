@@ -1,0 +1,9 @@
+# build directories 
+build/tmp
+build/sstate-cache
+build/cache
+build/downloads
+
+cache
+
+*.log
