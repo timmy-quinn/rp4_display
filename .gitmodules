@@ -6,3 +6,11 @@
 	path = src/poky
 	url = https://github.com/yoctoproject/poky.git
 	branch = scarthgap
+[submodule "meta-openembedded"]
+	path = meta-openembedded
+	url = https://github.com/openembedded/meta-openembedded.git
+	branch = scarthgap
+[submodule "src/meta-openembedded"]
+	path = src/meta-openembedded
+	url = https://github.com/openembedded/meta-openembedded.git
+	branch = scarthgap

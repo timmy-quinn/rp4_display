@@ -146,3 +146,48 @@ by default. This gives you access to things like ls, cat, cd, grep and more.
     commands, which helps make it more lightweight. 
     - To use ls, cd into the root folder, with ````cd /````
 
+## GPIO control 
+By default, the raspberry pi build has GPIOs enabled. However, if you wanted 
+to, I think that you could 
+
+[sysfs interface](https://www.thegoodpenguin.co.uk/blog/stop-using-sys-class-gpio-its-deprecated/)
+The sysfs interface is deprecated, but you can still use it. 
+```
+# Determine what the gpio number is. this will show the mappign between the 
+# raspberry pi pinout. 
+$ grep gpio /sys/kernel/debug/gpio
+
+# enable the gpio pin to be controlled 
+$ echo 21 > /sys/class/gpio/export  
+
+# set the gpio to output 
+$ echo out > /sys/class/gpio/gpio21/direction
+
+# set the gpio valuethen use 
+$ echo 1 > /sys/class/gpio/gpio21/value
+```
+
+To add ligpiod, you can use 
+
+```
+IMAGE_INSTALL:append = " libgpiod libgpiod-tools libgpiod-dev"
+```
+Which was found 
+[here](https://stackoverflow.com/questions/63243453/how-to-install-libgpiod-binary-in-usr-bin-in-yocto-operating-system) 
+since it was not immediately obvious
+
+
+You can use the following commands: 
+- gpioinfo: print info about GPIO lines
+- gpiodetect: lists all GPIO chips detected
+- gpioget: reads the current values of specified gpio lines
+- gpiofind: locates the gpio chip name and line offset for a given line name 
+- gpiomon: monitors gpio line for events 
+- gpioset set values fo specified gpio lines, holding the lines until the 
+process is killed or otherwise
+[more info](https://libgpiod.readthedocs.io/en/latest/gpio_tools.html)
+
+```
+gpoiset GPIO4=1
+```
+
