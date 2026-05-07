@@ -25,20 +25,35 @@ To build:
 ```
 bitbake core-image-base
 ```
+To build with weston emabeld: 
+```
+bitbake core-image-weston
+```
+
 
 ### Flashing 
 - bzip2 -d -f tmp/deploy/images/raspberrypi4/core-image-base-raspberrypi4.wic.bz2
 - Run df -h command to see what devices are currently mounted.
 - Insert your card into the card reader, and the card reader into your USB port.
 - Make sure that the device is mounted; the easiest way to do that is to open it with your file manager.
-- Run df -h again. The device that wasn't there last time is your SD card. The left column gives the device name of your SD card. It will be listed as something like /dev/mmcblk0p1 or /dev/sdd1. The last part (p1 or 1 respectively) is the partition number, but you want to write to the whole SD card, not just one partition, so you need to remove that part from the name (getting for example /dev/mmcblk0 or /dev/sdd) as the device for the whole SD card.
-- Unmount the card with umount /dev/[sd_name] command, where [sd_name] is the name you got from the previous step.
+- Run df -h again. The device that wasn't there last time is your SD card. 
+The left column gives the device name of your SD card. It will be listed as 
+something like /dev/mmcblk0p1 or /dev/sdd1. The last part (p1 or 1 
+respectively) is the partition number, but you want to write to the whole SD 
+card, not just one partition, so you need to remove that part from the 
+name (getting for example /dev/mmcblk0 or /dev/sdd) as the device for 
+the whole SD card.
+- Unmount the card with umount /dev/[sd_name] command, where [sd_name] is the 
+name you got from the previous step.
 
 ***NOTE BE SUPER CAREFUL***
 
 You can also shorten this process with 
-```
+```bash
 bzcat tmp/deploy/images/raspberrypi4/image-name.bz2 | sudo dd of=/dev/disk
+
+# This is the typical command for me
+bzcat tmp/deploy/images/raspberrypi4/core-image-weston-raspberrypi4.rootfs.wic.bz2 | sudo dd of=/dev/sdb
 ```
 
 Or use balena etcher, which I have downloaded, cause it won't let you delete 
@@ -46,6 +61,13 @@ your system drive
 
 balena etcher also apparently decompresses a bz2 file before flashing it, so 
 you don't even half to worry about it. 
+
+#### Serial connection 
+```bash
+# shows usb ports
+ls /dev/ttyUSB*
+screen /dev/ttyUSB0 115200
+```
 
 ### Adding additional meta layers
 
@@ -70,21 +92,15 @@ add the following in a new file names bitbake
 To load a profile into the kernel, use this command: 
 ```
 sudo apparmor_parser -r /etc/apparmor.d/profile.name
-
-
-
 ``` 
 
 
 #### License Error
-
-
 ERROR: Nothing RPROVIDES 'linux-firmware-rpidistro-bcm43455' (but /home/timmy/proj/learning_linux/raspberry_pi/build/../src/poky/meta/recipes-core/packagegroups/packagegroup-base.bb RDEPENDS on or otherwise requires it)
 linux-firmware-rpidistro RPROVIDES linux-firmware-rpidistro-bcm43455 but was skipped: Has a restricted license 'synaptics-killswitch' which is not listed in your LICENSE_FLAGS_ACCEPTED.
 
 More info here: 
 https://github.com/agherzan/meta-raspberrypi/issues/1111
-
 
 The solution was to add to local.conf
 
@@ -115,8 +131,6 @@ default baud rate is 115200
 
 It will ask for a login. The username is ```root``` by default, and it will not
 ask for a password (by default).
-
-
 
 #### SSH 
 Add the following to build/local.conf 
@@ -191,3 +205,27 @@ process is killed or otherwise
 gpoiset GPIO4=1
 ```
 
+### Init manager
+```
+INIT_MANAGER = "systemd"
+```
+
+
+## Wayland and Weston 
+### What is wayland? 
+- Wayland is a modern display protocol that defines communication between a display 
+server and its clients. 
+- Many different implementations of display servers that work with Wayland (these are called wayland compositors).
+- brings better features and performance than older X11
+- Fun fact, these are named after two cities in Massachusetts, near Waltham
+
+### What is weston? 
+It is the minimalistic wayland server provided by Wayland
+
+#### Requirements
+```
+INIT_MANAGER = "systemd"
+
+RPI_KERNEL_DEVICETREE_OVERLAYS += "overlays/vc4-kms-dsi-ili9881-7inch.dtbo"
+DISTRO_FEATURES:append = " pam"
+```
