@@ -14,3 +14,6 @@
 	path = src/meta-openembedded
 	url = https://github.com/openembedded/meta-openembedded.git
 	branch = scarthgap
+[submodule "src/meta-qt6"]
+	path = src/meta-qt6
+	url = git://code.qt.io/yocto/meta-qt6.git
